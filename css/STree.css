@@ -1,0 +1,87 @@
+/* tree module */
+.tree-wrap ul{
+    margin: 0;
+    padding: 0;
+}
+.tree-wrap .list-item-wrap {
+    list-style: none;
+    padding-left: 10px;
+    line-height: 30px;
+    user-select: none;
+}
+.tree-wrap .list-item-wrap .item {
+    position: relative;
+}
+.tree-wrap .list-item-wrap.group-item > .item::before, 
+.tree-wrap .list-item-wrap.root-item > .item::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 9px;
+    display: block;
+    border-width:3px 4px; 
+    border-style:solid; 
+    border-color:rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) #4c4c4c;
+}
+.tree-wrap .list-item-wrap.group-item.open > .item::before, 
+.tree-wrap .list-item-wrap.root-item.open > .item::before {
+    transform-origin: 25% 50%;
+    transform: rotate(90deg);
+}
+.tree-wrap .list-item-wrap.group-item > ul,
+.tree-wrap .list-item-wrap.root-item > ul {
+    display: none;
+}
+.tree-wrap .list-item-wrap.group-item.open > ul ,
+.tree-wrap .list-item-wrap.root-item.open > ul {
+    display: block;
+}
+.tree-wrap .list-item-wrap .item {
+    display: inline-block;
+    width: 100%;
+    padding: 0 8px 0 18px;
+    box-sizing: border-box;
+}
+.tree-wrap .list-item-wrap .item:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+.tree-wrap li .icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+    vertical-align: sub;
+    background-repeat: no-repeat;
+}
+.tree-wrap li .icon-all {
+    background-image: url(../img/all.png);
+    background-size: contain;
+}
+.tree-wrap li .icon-group {
+    background-image: url(../img/group.png);
+    background-size: contain;
+}
+.tree-wrap .checkbox {
+    position: relative;
+    float: right;
+    height: 21px;
+    margin-top: 4px;
+}
+.tree-wrap .checkbox i {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url(../img/noselect.png) no-repeat;
+    background-size: contain;
+    cursor: pointer;
+}
+.tree-wrap .checkbox input[type="checkbox"]:checked+i {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url(../img/select.png) no-repeat;
+    background-size: contain;
+}
+.tree-wrap .checkbox input[type="checkbox"]{
+    display: none;
+}
