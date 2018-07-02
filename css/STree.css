@@ -45,7 +45,7 @@
 .tree-wrap .list-item-wrap .item:hover {
     background-color: rgba(0, 0, 0, 0.08);
 }
-.tree-wrap li .icon {
+.tree-wrap .list-item-wrap .icon {
     display: inline-block;
     width: 18px;
     height: 18px;
@@ -53,11 +53,11 @@
     vertical-align: sub;
     background-repeat: no-repeat;
 }
-.tree-wrap li .icon-all {
+.tree-wrap .list-item-wrap .icon-all {
     background-image: url(../img/all.png);
     background-size: contain;
 }
-.tree-wrap li .icon-group {
+.tree-wrap .list-item-wrap .icon-group {
     background-image: url(../img/group.png);
     background-size: contain;
 }

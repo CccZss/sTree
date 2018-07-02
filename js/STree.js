@@ -1,5 +1,4 @@
 (function(window){
-
     function extend(subClass, superClass) {
         var F = function() {}
         F.prototype = superClass.prototype;
@@ -10,25 +9,30 @@
             superClass.prototype.constructor = superClass;
         }
     }
-
     /* 树类 */
-    function STree(wrapElm, data, option={}) {
-        var defaultOption = {
-            defaultSelects: [],
-            hasRootElement: true,
-            onSelectChange: function(){},
-            onShowChange: function(){}
-        }
-        option = Object.assign(defaultOption, option)
+    function STree(wrapElm, data, option) {
+        var obj = Object.assign({}, STree.defaultOption)
+        option = Object.assign(obj, option)
         this.option = option;
         this.element = wrapElm;
         this.element.className += " tree-wrap"
         this.rootNode = new STreeRoorNode("选择全部", null, option)
         this.data = data;
         this.element.appendChild(this.rootNode.element);
-        this.setData(data, this.option);
+        this._setData(data, this.option);
     }
-    STree.prototype.addNode =  function(child){
+    STree.defaultOption = {
+        defaultSelects: [],   // 通过id数组初始化选择的项
+        name: 'name',         // 传入的 data 中，作为显示的文字的字段
+        id: 'id',             // 传入的字段中，作为标识一个项的字段
+        hasRootElement: true,  // 是否有全选的根字段
+        onSelectChange: function(item){},   // 有某一项的选择状态改变时触发，item 为触发项对象
+        onShowChange: function(item){}     // 有某一项的显示状态改变时触发，item 为触发项对象
+    }
+    STree.prototype._addNode =  function(child){
+        if(!this.rootNode) {
+            return
+        }
         child.parendNode = this.rootNode;
         this.rootNode.childrenList.push(child)
         this.rootNode.childElement.appendChild(child.element);
@@ -36,39 +40,49 @@
             child.parendNode.unSelectSelf()
         }
     };
-    STree.prototype.setData = function(data=[], option) {
+    STree.prototype._setData = function(data, option) {
+        if(!data) {
+            return;
+        }
         var that = this
         data.forEach(function(data) {
             if(data.childrens) {
-                var node = new STreeGroupNode(data.name, data.id, option);
-                that.addNode(node);
+                var node = new STreeGroupNode(data[option.name], data[option.id], option);
+                that._addNode(node);
                 data.childrens.forEach(function(data) {
-                    node.setData(data, option);
+                    node._setData(data, option);
                 })
             }else {
-                var node = new STreeItemNode(data.name, data.id, option);
-                that.addNode(node);
+                var node = new STreeItemNode(data[option.name], data[option.id], option);
+                that._addNode(node);
                 if(option.defaultSelects.indexOf(node.id)!==-1) {
                     node.select()
                 }
             }
         })
     }
-    STree.prototype.reSetData = function(data=[], option) {
+    STree.prototype.resetData = function(data, option) {
         if(option) {
-            this.option = option
+            var obj = Object.assign({}, this.option)
+            this.option = Object.assign(obj, option)
         }
         if(data) {
             this.data = data;
         }
         this.clearData();
-        this.setData(this.data, this.option);
+        this._setData(this.data, this.option);
     }
     STree.prototype.clearData = function() {
+        if(!this.rootNode) {
+            return
+        }
         this.rootNode.childrenList = [];
-        this.rootNode.childElement.innerHTML = [];
+        this.rootNode.childElement.innerHTML = "";
     }
     STree.prototype.changeNodeSelect = function(id, status) {
+        if(!this.rootNode) {
+            return
+        }
         var item = this.rootNode.getChildNodeById(id)[0];
         if(item) {
             if(status) {
@@ -79,12 +93,21 @@
         }
     }
     STree.prototype.getChildNodeById = function(id) {
+        if(!this.rootNode) {
+            return null
+        }
         return this.rootNode.getChildNodeById(id)[0]
     }
     STree.prototype.setNodeItem = function(item) {
-        this.rootNode.addNode(item)
+        if(!this.rootNode) {
+            return
+        }
+        this.rootNode._addNode(item)
     }
     STree.prototype.getAllSelectItemInfo = function() {
+        if(!this.rootNode) {
+            return []
+        }
         var selectNodes = this.rootNode.getSelectChild();
         var infos = [];
         selectNodes.forEach(function(node){
@@ -93,12 +116,44 @@
         return infos;
     }
     STree.prototype.getAllItemNodeInfo = function() {
+        if(!this.rootNode) {
+            return []
+        }
         var nodes = this.rootNode.getAllItemNode();
         var infos = [];
         nodes.forEach(function(node){
             infos.push(node.getNodeInfo());
         })
         return infos;
+    }
+    STree.prototype.isSelectAll = function() {
+        return this.getAllItemNodeInfo().length === this.getAllSelectItemInfo().length
+    }
+    STree.prototype.unSelectAll = function() {
+        if(!this.rootNode) {
+            return null
+        }
+        this.rootNode.unSelect()
+    }
+    STree.prototype.selectAll = function() {
+        if(!this.rootNode) {
+            return null
+        }
+        this.rootNode.select();
+    }
+    STree.prototype.destroy = function() {
+        if(!this.rootNode) {
+            return null
+        }
+        this.rootNode.childrenList.forEach(function(item) {
+            item.destroy();
+        })
+        this.rootNode.element.parentElement.removeChild(this.rootNode.element)
+        this.rootNode.childrenList = null;
+        this.data = null;
+        this.option = null;
+        this.element = null;
+        this.rootNode = null;
     }
 
     /* 树的 node 接口类 */
@@ -115,27 +170,27 @@
         this.onSelectChange =  option.onSelectChange
         this.onShowChange =  option.onShowChange
     }
-    STreeNode.prototype.addNode = function(child){
+    STreeNode.prototype._addNode = function(child){
         child.parendNode = this;
         this.childrenList.push(child);
         this.childElement.appendChild(child.element);
         if(!child.isSelect && child.parendNode.isSelect) {
-            child.parendNode.unSelect()
+            child.parendNode.unSelectSelf()
         }
     };
-    STreeNode.prototype.removeNode = function(child){
+    STreeNode.prototype._removeNode = function(child){
         for(var i=0; i<this.childrenList.length ;i++) {
             if(this.childrenList(i) == child) {
                 this.childrenList.splice(i, 1);
-                child.removeNode()
+                child._removeNode()
                 break;
             }
         }
     };
     STreeNode.prototype.select = function(){
-        this.checkBoxEle.setAttribute("checked", "checked");
         this.isSelect = true;
         if(this.type === 'item') {
+            this.checkBoxEle.setAttribute("checked", "checked");
             this.onSelectChange(this)
         }
         this.childrenList.forEach(function(item){
@@ -162,6 +217,17 @@
         return {
             name: this.name,
             id: this.id
+        }
+    }
+    STreeNode.prototype.destroy = function() {
+        if(this.childrenList.length > 0) {
+            this.childrenList.forEach(function(item) {
+                item.destroy();
+            })
+            this.element.parentElement.removeChild(this.element)
+            this.childrenList = null;
+        }else {
+            this.element.parentElement.removeChild(this.element)
         }
     }
 
@@ -222,6 +288,9 @@
         if(this.element.className.indexOf('open') == -1) {
             this.element.className = this.element.className.trim() + " open";
         }
+        if(this.parendNode) {
+            this.parendNode.show()
+        }
         this.onShowChange(this)
     };
     STreeGroupNode.prototype.hide = function(){
@@ -251,16 +320,16 @@
             this.parendNode._childSelectChange(this.id, this.isSelect)
         }
     };
-    STreeGroupNode.prototype.setData = function(data, option) {  //group
+    STreeGroupNode.prototype._setData = function(data, option) {  //group
         if(data.childrens) {
-            var node = new STreeGroupNode(data.name, data.id, option);
-            this.addNode(node);
+            var node = new STreeGroupNode(data[option.name], data[option.id], option);
+            this._addNode(node);
             data.childrens.forEach(function(data) {
-                node.setData(data, option);
+                node._setData(data, option);
             })
         }else {
-            var node = new STreeItemNode(data.name, data.id, option);
-            this.addNode(node);
+            var node = new STreeItemNode(data[option.name], data[option.id], option);
+            this._addNode(node);
             if(option.defaultSelects.indexOf(node.id)!==-1) {
                 node.select()
             }
@@ -302,8 +371,10 @@
         })
         return data;
     }
-    STreeGroupNode.prototype._childSelectChange = function(id, status) {  //group
-        // console.log(id, status);
+    STreeGroupNode.prototype._childSelectChange = function(id, status) {
+        if(status) {
+            this.show()
+        }
         var selectItems = [];
         this.childrenList.forEach(function(item) {
             if(item.isSelect) {

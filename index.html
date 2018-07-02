@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <link rel="stylesheet" href="./css/STree.css">
+    <link rel="stylesheet" href="./css/sTree.css">
 </head>
 <style>
     /* 滚动条滑块 */
@@ -24,36 +24,6 @@
     }
     
     /* other */
-    #addNewBox {
-        width: 656px;
-        border: 1px solid #afafaf;
-        margin-bottom: 20px;
-    }
-    .search-table-warp {
-        padding: 8px;
-    }
-    .search-table-warp .add-group-bt {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-image: url(./img/add.png);
-        background-size: contain;
-        vertical-align: bottom;
-        cursor: pointer;
-    }
-    .search-table-warp .group-warp div span {
-        padding: 5px 9px;
-        margin: 2px;
-        display: inline-block;
-        border: 1px solid #949494;
-    }
-    .search-table-warp .group-warp div {
-        margin: 10px 10px 0;
-    }
-    .search-table-warp > div {
-        margin: 8px 0;
-    }
-    
     .select-app-group {
         width: 656px;
         border: 1px solid #afafaf;
@@ -111,10 +81,6 @@
         box-sizing: border-box;
     }
 
-    .left-box .search-groups {
-        /* border-top: 1px solid black; */
-    }
-
     /* right */
     .select-app-group .right-box {
         width: 50%;
@@ -146,38 +112,13 @@
         top: 8px;
         width: 15px;
         height: 15px;
-        background-image: url(../img/close.png);
+        background-image: url(./img/close.png);
         background-size: contain;
         cursor: pointer;
     }
 </style>
 <body>
-    <div id="addNewBox">
-        <div class="search-table-warp">
-            <div>
-                <span>选择共享表：</span>
-                <input type="text">
-            </div>
-            <div>
-                <span>选择共享组：</span>
-                <i class="add-group-bt"></i>
-            </div>
-            <div class="group-warp">
-                <span>已选共享组：</span>
-                <span class="select-group"></span>
-                <div>
-                    <span>应用组1-1</span>
-                    <span>应用组1-1</span>
-                    <span>应用组1-1</span>
-                    <span>应用组1-1</span>
-                    <span>应用组1-1</span>
-                    <span>应用组1-1</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div title="设置属性" class="select-app-group" >
+    <div class="select-app-group" >
         <p class="title">共享到应用组</p>
         <div class="select-wrap">
             <div class="search-warp">
@@ -198,269 +139,144 @@
     </div>
 </body>
 <script src="./js/jquery-1.8.3.min.js"></script>
-<script src="./js/STree.js"></script>
+<script src="./js/sTree.js"></script>
 <script>
 var data1 = [
     {
-        name: "无线运营",
-        id: 1,
+        name1: "无线运营",
+        id1: 1,
         childrens:[{
-            name: "应用组1-1",
-            id: 2,
+            name1: "应用组1-1",
+            id1: 2,
         },{
-            name: "应用组1-2",
-            id: 3
+            name1: "应用组1-2",
+            id1: 3
         }]
     },{
-        name: "无线运营2",
-        id: 4,
+        name1: "无线运营2",
+        id1: 4,
         childrens:[{
-            name: "应用组2-1",
-            id: 5
+            name1: "应用组2-1",
+            id1: 5
         },{
-            name: "应用组2-2",
-            id: 6,
+            name1: "应用组2-2",
+            id1: 6,
         },{
-            name: "应用组2-3",
-            id: 7
+            name1: "应用组2-3",
+            id1: 7
         },{
-            name: "应用组2-4",
-            id: 8
+            name1: "应用组2-4",
+            id1: 8
         },
         {
-            name: "应用组2-5",
-            id: 9
+            name1: "应用组2-5",
+            id1: 9
         },{
-            name: "应用组2-6",
-            id: 10
+            name1: "应用组2-6",
+            id1: 10
         }]
     },{
-    name: "无线运营3",
-    id: 1,
+    name1: "无线运营3",
+    id1: 1,
     childrens:[{
-            name: "应用组3-1",
-            id: 11
+            name1: "应用组3-1",
+            id1: 11
         },{
-            name: "应用组3-2",
-            id: 12
+            name1: "应用组3-2",
+            id1: 12
         },{
-            name: "应用组3-3",
-            id: 13
+            name1: "应用组3-3",
+            id1: 13
         }]
     }
 ]
 
-var data2 = [
-    {
-        name: "应用组2-1",
-        id: 5
-    },{
-        name: "应用组2-2",
-        id: 6,
-    },{
-        name: "应用组2-3",
-        id: 7
-    },{
-        name: "应用组2-4",
-        id: 8
-    },
-    {
-        name: "应用组2-5",
-        id: 9
-    },{
-        name: "应用组2-6",
-        id: 10
-    } 
-]
-
-var data3 = [
-    {
-        name: "应用组1-1",
-        id: 2,
-    },{
-        name: "应用组1-2",
-        id: 3
-    }
-]
-
-var tree1 = new STree(document.querySelector(".left-box .all-groups"), data1, {
-    onSelectChange: function(item) {
-        // console.log(item.isSelect, item.name, item.id)
-        var ul = $('.right-box ul')[0]
-        if(item.isSelect) {
-            if($('li[data-id=' + item.id + ']').length === 0) {
-                var li = $(`<li data-id=${item.id}>${item.name}
-                            <i class="close-bt"></i>
-                        </li>`)
-                ul.appendChild(li[0])
-            }
-        }else {
-            var liEle = $('li[data-id=' + item.id + ']');
-            liEle.each(function() {
-                ul.removeChild(this)
-            })
-        }
-        if($(ul).find('li').length > 0) {
-            $('.tip-info').text('已选择 ' + $(ul).find('li').length + ' 个应用组')
-        }else {
-            $('.tip-info').text('请选择需要添加的应用组')
-        }
-    },
-    onShowChange: function(item) {
-        // console.log(item.name, item.id, item.isShow)
-    }
-})
-
-var tree2 = new STree(document.querySelector(".left-box .search-groups"),[] , {
-    defaultSelects: [2,5],
-    hasRootElement: false,
-    onSelectChange: function(item) {
-        console.log(item.isSelect, item.name, item.id)
-        if(item.isSelect) {
-            tree1.changeNodeSelect(item.id, true)
-        }else {
-            tree1.changeNodeSelect(item.id, false)
-        }
-    },
-})
-
-$('.right-box').on('click', 'li i', function(event) {
-    var id = $(this).parent().attr('data-id');
-    tree1.changeNodeSelect(id, false);
-    tree2.changeNodeSelect(id, false);
-})
-$('.search-input').on('input', function(event) {
-    var text = $(this).val().trim();
-    var allGroupsEle = $('.all-groups');
-    var serachGroupsEle = $('.search-groups');
-    if(text.length === 0 ) {
-        serachGroupsEle.hide();
-        allGroupsEle.show();
-    }else {
-        var allItems = tree1.getAllItemNodeInfo();
-        var searchItems = allItems.filter(function(item) {
-            return item.name.indexOf(text) !== -1;
-        })
-
-        var selectInfo = tree1.getAllSelectItemInfo();
-        var defaultSelects = [];
-        selectInfo.forEach(function(item){
-            defaultSelects.push(item.id)
-        });
-        
-        tree2.reSetData(searchItems, {
-            defaultSelects: defaultSelects,
-            hasRootElement: false,
-            onSelectChange: function(item) {
-                if(item.isSelect) {
-                    tree1.changeNodeSelect(item.id, true)
-                }else {
-                    tree1.changeNodeSelect(item.id, false)
+function init () {
+    var tree1 = new STree(document.querySelector(".left-box .all-groups"), data1, {
+        name: 'name1',
+        id: 'id1',
+        onSelectChange: function(item) {
+            console.log(item.isSelect, item.id, '--------')
+            var ul = $('.right-box ul')[0]
+            if(item.isSelect) {
+                if($('li[data-id=' + item.id + ']').length === 0) {
+                    var li = $(`<li data-id=${item.id}>${item.name}
+                                <i class="close-bt"></i>
+                            </li>`)
+                    ul.appendChild(li[0])
                 }
-            },
-        })
-        serachGroupsEle.show();
-        allGroupsEle.hide();
-    }
-})
+            }else {
+                var liEle = $('li[data-id=' + item.id + ']');
+                liEle.each(function() {
+                    ul.removeChild(this)
+                })
+            }
+            if($(ul).find('li').length > 0) {
+                $('.tip-info').text('已选择 ' + $(ul).find('li').length + ' 个应用组')
+            }else {
+                $('.tip-info').text('请选择需要添加的应用组')
+            }
+        },
+        onShowChange: function(item) {
+            // console.log(item.name, item.id, item.isShow)
+        }
+    })
+    
+    var tree2 = new STree(document.querySelector(".left-box .search-groups"), null , {
+        defaultSelects: [2,5],
+        hasRootElement: false,
+        onSelectChange: function(item) {
+            console.log(item.isSelect, item.name, item.id)
+            if(item.isSelect) {
+                tree1.changeNodeSelect(item.id, true)
+            }else {
+                tree1.changeNodeSelect(item.id, false)
+            }
+        },
+    })
+    
+    $('.right-box').on('click', 'li i', function(event) {
+        var id = $(this).parent().attr('data-id');
+        tree1.changeNodeSelect(id, false);
+        tree2.changeNodeSelect(id, false);
+    })
+    $('.search-input').on('input', function(event) {
+        var text = $(this).val().trim();
+        var allGroupsEle = $('.all-groups');
+        var serachGroupsEle = $('.search-groups');
+        if(text.length === 0 ) {
+            serachGroupsEle.hide();
+            allGroupsEle.show();
+        }else {
+            var allItems = tree1.getAllItemNodeInfo();
+            var searchItems = allItems.filter(function(item) {
+                return item.name.indexOf(text) !== -1;
+            })
+    
+            var selectInfo = tree1.getAllSelectItemInfo();
+            var defaultSelects = [];
+            selectInfo.forEach(function(item){
+                defaultSelects.push(item.id)
+            });
+            
+            tree2.resetData(searchItems, {
+                defaultSelects: defaultSelects,
+                hasRootElement: false,
+                onSelectChange: function(item) {
+                    if(item.isSelect) {
+                        tree1.changeNodeSelect(item.id, true)
+                    }else {
+                        tree1.changeNodeSelect(item.id, false)
+                    }
+                },
+            })
+            serachGroupsEle.show();
+            allGroupsEle.hide();
+        }
+    })
+    return [tree1, tree2];
+}
+var [tree1, tree2] = init()
+
 </script>
-<!-- 
-<div class="tree-wrap">
-    <ul class="group-item-wrap">
-        <li class="list-item-wrap group-item">
-            <span class="item">
-                <span class="icon icon-all"></span><span class="name">选择全部</span>
-                    <label class="checkbox">
-                    <input type="checkbox">
-                    <i></i>
-                </label>
-            </span>
-            <ul class="group-item-wrap">
-                <li class="list-item-wrap group-item">
-                    <span class="item">
-                        <span class="icon icon-group"></span><span class="name">体验测试</span>
-                            <label class="checkbox">
-                            <input type="checkbox">
-                            <i></i>
-                        </label>
-                    </span>
-                    <ul class="group-item-wrap">
-                        <li class="list-item-wrap">
-                            <span class="item">
-                                <span class="icon"></span>
-                                <span class="name">引用组1</span>
-                                    <label class="checkbox">
-                                    <input type="checkbox">
-                                    <i></i>
-                                </label>
-                            </span>
-                        </li>
-                        <li class="list-item-wrap">
-                            <span class="item">
-                                <span class="icon"></span>
-                                <span class="name">引用组2</span>
-                                    <label class="checkbox">
-                                    <input type="checkbox">
-                                    <i></i>
-                                </label>
-                            </span>
-                        </li>
-                        <li class="list-item-wrap">
-                            <span class="item">
-                                <span class="icon"></span>
-                                <span class="name">引用组3</span>
-                                    <label class="checkbox">
-                                    <input type="checkbox">
-                                    <i></i>
-                                </label>
-                            </span>
-                        </li>
-                        <li class="list-item-wrap">
-                            <span class="item">
-                                <span class="icon"></span>
-                                <span class="name">引用组4</span>
-                                    <label class="checkbox">
-                                    <input type="checkbox">
-                                    <i></i>
-                                </label>
-                            </span>
-                        </li>
-                    </ul>
-                </li>
-                <li class="list-item-wrap  group-item">
-                    <span class="item">
-                        <span class="icon icon-group"></span><span class="name">无线运营</span>
-                        <label class="checkbox">
-                            <input type="checkbox">
-                            <i></i>
-                        </label>
-                    </span>
-                    <ul class="group-item-wrap">
-                        <li class="list-item-wrap">
-                            <span class="item">
-                                <span class="icon"></span>
-                                <span class="name">引用组1</span>
-                                    <label class="checkbox">
-                                    <input type="checkbox">
-                                    <i></i>
-                                </label>
-                            </span>
-                        </li>
-                        <li class="list-item-wrap">
-                            <span class="item">
-                                <span class="icon"></span>
-                                <span class="name">引用组2</span>
-                                    <label class="checkbox">
-                                    <input type="checkbox">
-                                    <i></i>
-                                </label>
-                            </span>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </li>
-    </ul>
-</div>
- -->
 </html>
