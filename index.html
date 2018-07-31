@@ -119,7 +119,7 @@
 </style>
 <body>
     <div class="select-app-group" >
-        <p class="title">共享到应用组</p>
+        <p class="title">共享到小组</p>
         <div class="select-wrap">
             <div class="search-warp">
                 <sapn class="input-wrap">
@@ -131,7 +131,7 @@
                 <div class="search-groups" style="display: none"></div>
             </div>
             <div class="right-box">
-                <p class="tip-info">请选择需要添加的应用组</p>
+                <p class="tip-info">请选择需要添加的小组</p>
                 <ul>
                 </ul>
             </div>
@@ -143,58 +143,61 @@
 <script>
 var data1 = [
     {
-        name1: "无线运营",
+        name1: "部门一",
         id1: 1,
         childrens:[{
-            name1: "应用组1-1",
+            name1: "小组1-1",
             id1: 2,
         },{
-            name1: "应用组1-2",
+            name1: "小组1-2",
             id1: 3
         }]
     },{
-        name1: "无线运营2",
+        name1: "部门二",
         id1: 4,
         childrens:[{
-            name1: "应用组2-1",
+            name1: "小组2-1",
             id1: 5
         },{
-            name1: "应用组2-2",
+            name1: "小组2-2",
             id1: 6,
         },{
-            name1: "应用组2-3",
+            name1: "小组2-3",
             id1: 7
         },{
-            name1: "应用组2-4",
+            name1: "小组2-4",
             id1: 8
         },
         {
-            name1: "应用组2-5",
+            name1: "小组2-5",
             id1: 9
         },{
-            name1: "应用组2-6",
+            name1: "小组2-6",
             id1: 10
         }]
     },{
-    name1: "无线运营3",
+    name1: "部门三",
     id1: 1,
     childrens:[{
-            name1: "应用组3-1",
+            name1: "小组3-1",
             id1: 11
         },{
-            name1: "应用组3-2",
+            name1: "小组3-2",
             id1: 12
         },{
-            name1: "应用组3-3",
+            name1: "小组3-3",
             id1: 13
         }]
     }
 ]
 
+// 创建两个树实例，并使用它们来实现微信创建群聊的选择框
 function init () {
     var tree1 = new STree(document.querySelector(".left-box .all-groups"), data1, {
         name: 'name1',
         id: 'id1',
+        defaultSelects: [2],
+        singleSelect: false,
         onSelectChange: function(item) {
             console.log(item.isSelect, item.id, '--------')
             var ul = $('.right-box ul')[0]
@@ -212,9 +215,9 @@ function init () {
                 })
             }
             if($(ul).find('li').length > 0) {
-                $('.tip-info').text('已选择 ' + $(ul).find('li').length + ' 个应用组')
+                $('.tip-info').text('已选择 ' + $(ul).find('li').length + ' 个小组')
             }else {
-                $('.tip-info').text('请选择需要添加的应用组')
+                $('.tip-info').text('请选择需要添加的小组')
             }
         },
         onShowChange: function(item) {
@@ -235,6 +238,7 @@ function init () {
         },
     })
     
+    // 其他业务逻辑
     $('.right-box').on('click', 'li i', function(event) {
         var id = $(this).parent().attr('data-id');
         tree1.changeNodeSelect(id, false);
@@ -274,6 +278,7 @@ function init () {
             allGroupsEle.hide();
         }
     })
+    
     return [tree1, tree2];
 }
 var [tree1, tree2] = init()

@@ -1,3 +1,19 @@
+// 全局暴露构造函数变量：STree，不依赖外部库
+
+/* 具有以下方法，具体说明请看下面源码注释：
+ * 1. resetData
+ * 2. clearData
+ * 3. changeNodeSelect
+ * 4. setNodeItem
+ * 5. getAllSelectItemInfo
+ * 6. getAllItemNodeInfo
+ * 7. isSelectAll
+ * 8. selectAll
+ * 9. unSelectAll
+ * 10. selectItems
+ * 11. destroy
+*/ 
+
 (function(window){
     function extend(subClass, superClass) {
         var F = function() {}
@@ -23,21 +39,22 @@
     }
     STree.defaultOption = {
         defaultSelects: [],   // 通过id数组初始化选择的项
-        name: 'name',         // 传入的 data 中，作为显示的文字的字段
-        id: 'id',             // 传入的字段中，作为标识一个项的字段
-        hasRootElement: true,  // 是否有全选的根字段
-        onSelectChange: function(item){},   // 有某一项的选择状态改变时触发，item 为触发项对象
-        onShowChange: function(item){}     // 有某一项的显示状态改变时触发，item 为触发项对象
+        name: 'name',         // 传入的 data 中，作为显示的文字的属性
+        id: 'id',             // 传入的 data 中，作为标识一个项的属性
+        singleSelect: false,
+        hasRootElement: true,  // 是否创建一个包含所有节点的根节点
+        onSelectChange: function(item){},   // 钩子函数，当有某一项的选择状态改变时触发，回调函数的参数 item 为触发项对象
+        onShowChange: function(item){}     // 钩子函数，有某一项的显示状态改变时触发，回调函数的参数 item 为触发项对象
     }
     STree.prototype._addNode =  function(child){
         if(!this.rootNode) {
             return
         }
-        child.parendNode = this.rootNode;
+        child.parentNode = this.rootNode;
         this.rootNode.childrenList.push(child)
         this.rootNode.childElement.appendChild(child.element);
-        if(!child.isSelect && child.parendNode.isSelect) {
-            child.parendNode.unSelectSelf()
+        if(!child.isSelect && child.parentNode.isSelect) {
+            child.parentNode.unSelectSelf()
         }
     };
     STree.prototype._setData = function(data, option) {
@@ -61,7 +78,23 @@
             }
         })
     }
-    STree.prototype.resetData = function(data, option) {
+
+    /* 重置树的信息
+     * data: 初始数据, 没个节点有三个属性 [name, id, childrens(可选)] ，支持多重 childrens 嵌套
+       例如: [{ 
+        name: "部门一", 
+        id: 1, 
+        childrens:[{
+            name1: "小组1-1",
+                id1: 2,
+            },{
+                name1: "小组1-2",
+                id1: 3
+            }]
+        },...]
+     * option: 配置信息，具体参考 STree.defaultOption对象
+     */
+     STree.prototype.resetData = function(data, option) {
         if(option) {
             var obj = Object.assign({}, this.option)
             this.option = Object.assign(obj, option)
@@ -72,6 +105,8 @@
         this.clearData();
         this._setData(this.data, this.option);
     }
+
+    // 清空数据，保留配置
     STree.prototype.clearData = function() {
         if(!this.rootNode) {
             return
@@ -79,6 +114,11 @@
         this.rootNode.childrenList = [];
         this.rootNode.childElement.innerHTML = "";
     }
+
+    /* 根据节点 Id 修改节点选择状态
+     * id: 节点 Id
+     * status: true(选中)， false(取消选中)
+     */
     STree.prototype.changeNodeSelect = function(id, status) {
         if(!this.rootNode) {
             return
@@ -92,18 +132,24 @@
             }
         }
     }
+
+    // 根据节点 Id 获取某个节点实例
     STree.prototype.getChildNodeById = function(id) {
         if(!this.rootNode) {
             return null
         }
         return this.rootNode.getChildNodeById(id)[0]
     }
+
+    // 在跟节点下添加新节点，item 参考 resetData 的 data 参数
     STree.prototype.setNodeItem = function(item) {
         if(!this.rootNode) {
             return
         }
         this.rootNode._addNode(item)
     }
+
+    // 获取当前树实例选中的项
     STree.prototype.getAllSelectItemInfo = function() {
         if(!this.rootNode) {
             return []
@@ -115,6 +161,8 @@
         })
         return infos;
     }
+
+    // 获取当前树实例的叶节点数据
     STree.prototype.getAllItemNodeInfo = function() {
         if(!this.rootNode) {
             return []
@@ -126,6 +174,8 @@
         })
         return infos;
     }
+
+    // 获取当前树实例是否全选，返回 true/false
     STree.prototype.isSelectAll = function() {
         return this.getAllItemNodeInfo().length === this.getAllSelectItemInfo().length
     }
@@ -135,12 +185,32 @@
         }
         this.rootNode.unSelect()
     }
+
+    // 全选所有叶节点
     STree.prototype.selectAll = function() {
         if(!this.rootNode) {
             return null
         }
         this.rootNode.select();
     }
+    // 取消选中全部
+    STree.prototype.unSelectAll = function() {
+        if(!this.rootNode) {
+            return null
+        }
+        this.rootNode.unSelect();
+    }
+
+    /* 选取指定节点
+     * itemList：要选择的叶子节点的 id 数组，如 [2,3,5]
+     */
+    STree.prototype.selectItems = function(itemList) {
+        this.resetData(null, {
+            defaultSelects: itemList
+        })
+    },
+
+    // 销毁整颗数，包括左右节点实例和数据，请勿直接将实例引用置为 null，这样做会引起内存泄漏
     STree.prototype.destroy = function() {
         if(!this.rootNode) {
             return null
@@ -156,26 +226,30 @@
         this.rootNode = null;
     }
 
-    /* 树的 node 接口类 */
+
+/********** 下面的类的实例不会暴露到 window 上 ******************************************************************/
+
+    /* 树的 node 接口类 ***************************************************/
     var STreeNode = function (name, id, type, option) {
         this.name = name;
         this.id = id;
-        this.type = type;  // 'group | item'
+        this.type = type;  // 'group | item | root'
         this.element = null;
         this.checkBoxEle = null;
         this.isSelect = false;
         this.childrenList = [];
-        this.parendNode = null;
+        this.parentNode = null;
+        this.option = option
 
         this.onSelectChange =  option.onSelectChange
         this.onShowChange =  option.onShowChange
     }
     STreeNode.prototype._addNode = function(child){
-        child.parendNode = this;
+        child.parentNode = this;
         this.childrenList.push(child);
         this.childElement.appendChild(child.element);
-        if(!child.isSelect && child.parendNode.isSelect) {
-            child.parendNode.unSelectSelf()
+        if(!child.isSelect && child.parentNode.isSelect) {
+            child.parentNode.unSelectSelf()
         }
     };
     STreeNode.prototype._removeNode = function(child){
@@ -196,8 +270,8 @@
         this.childrenList.forEach(function(item){
             item.select();
         })
-        if(this.parendNode) {
-            this.parendNode._childSelectChange(this.id, this.isSelect)
+        if(this.parentNode) {
+            this.parentNode._childSelectChange(this.id, this.isSelect)
         }
     };
     STreeNode.prototype.unSelect = function(){
@@ -209,14 +283,21 @@
         this.childrenList.forEach(function(item){
             item.unSelect();
         })
-        if(this.parendNode) {
-            this.parendNode._childSelectChange(this.id, this.isSelect)
+        if(this.parentNode) {
+            this.parentNode._childSelectChange(this.id, this.isSelect)
         }
     };
     STreeNode.prototype.getNodeInfo = function() {
         return {
             name: this.name,
             id: this.id
+        }
+    }
+    STreeNode.prototype.unSelectRootTree = function() {
+        if(this.type == 'root') {
+            this.unSelect();
+        }else {
+            this.parentNode.unSelectRootTree();
         }
     }
     STreeNode.prototype.destroy = function() {
@@ -232,7 +313,7 @@
     }
 
 
-    /* 树的 group node 类 */
+    /* 树的 group node 类 *********************************************************/
     var STreeGroupNode = function(name, id, option) {
         STreeNode.call(this, name, id, 'group', option);
         this.isShow = false;
@@ -258,7 +339,9 @@
         labelEle.appendChild(document.createElement('i'))
         itemEle.appendChild(iconEle);
         itemEle.appendChild(nameEle);
-        itemEle.appendChild(labelEle);
+        if(!this.option.singleSelect) {
+            itemEle.appendChild(labelEle);
+        }
         this.element.appendChild(itemEle);
         this.element.appendChild(this.childElement);
 
@@ -288,8 +371,8 @@
         if(this.element.className.indexOf('open') == -1) {
             this.element.className = this.element.className.trim() + " open";
         }
-        if(this.parendNode) {
-            this.parendNode.show()
+        if(this.parentNode) {
+            this.parentNode.show()
         }
         this.onShowChange(this)
     };
@@ -306,8 +389,8 @@
         if(this.type === 'item') {
             this.onSelectChange(this)
         }
-        if(this.parendNode) {
-            this.parendNode._childSelectChange(this.id, this.isSelect)
+        if(this.parentNode) {
+            this.parentNode._childSelectChange(this.id, this.isSelect)
         }
     };
     STreeGroupNode.prototype.unSelectSelf = function(){  //group
@@ -316,8 +399,8 @@
         if(this.type === 'item') {
             this.onSelectChange(this)
         }
-        if(this.parendNode) {
-            this.parendNode._childSelectChange(this.id, this.isSelect)
+        if(this.parentNode) {
+            this.parentNode._childSelectChange(this.id, this.isSelect)
         }
     };
     STreeGroupNode.prototype._setData = function(data, option) {  //group
@@ -388,7 +471,7 @@
         }
     }
 
-    /* 树的 item node 类 */
+    /* 树的 item node 类 *****************************************************/
     var STreeItemNode = function(name, id, option) {
         STreeNode.call(this, name, id, 'item', option);
 
@@ -410,19 +493,23 @@
         labelEle.appendChild(document.createElement('i'))
         // itemEle.appendChild(iconEle);
         itemEle.appendChild(nameEle);
-        itemEle.appendChild(labelEle);
         this.element.appendChild(itemEle);
+        itemEle.appendChild(labelEle);
 
         itemEle.onclick = function(event) {
             if(this.isSelect) {
                 this.unSelect();
             }else {
+                if(this.option.singleSelect) {
+                    this.unSelectRootTree()
+                }
                 this.select();
             }
         }.bind(this)
     }
     extend(STreeItemNode, STreeNode);
 
+    /* 树的 root node 类 ***************************************************/
     var STreeRoorNode = function(name, id, option) {
         STreeNode.call(this, name, id, 'root', option);
 
@@ -447,7 +534,9 @@
         labelEle.appendChild(document.createElement('i'))
         itemEle.appendChild(iconEle);
         itemEle.appendChild(nameEle);
-        itemEle.appendChild(labelEle);
+        if(!this.option.singleSelect) {
+            itemEle.appendChild(labelEle);
+        }
         if(option.hasRootElement) {
             this.element.appendChild(itemEle);
         }
